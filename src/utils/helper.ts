@@ -35,7 +35,7 @@ export function getNumHours(datetime: string): number {
  * @returns the day of the week as a string (e.g., "Monday", "Tuesday", etc.)
  */
 function getDayOfWeek(datetime: string): string {
-    const date = new Date(datetime);
+    const date = new Date(datetime + "EDT");
     return date.toLocaleString('en-US', { weekday: 'long' });
 }
 
@@ -45,6 +45,33 @@ function getDayOfWeek(datetime: string): string {
  * @returns human-readable string with the day of the week and date ie "Monday, January 1, 2023"
  */
 export function humanizeDay(datetime: string): string {
-    const date = new Date(datetime);
+    const date = new Date(datetime + "EDT");
     return getDayOfWeek(datetime) + ", " + date.toLocaleDateString('en-US', { month: 'long', day: 'numeric'});
+}
+
+/**
+ * 
+ * @param datetime string in "HH:MM:SS" format
+ * @returns human-readable string with the time in 12-hour format, e.g., "2:00 PM"
+ */
+export function humanizeTime(datetime: string): string {
+    let hour = getNumHours(datetime); 
+    const parity = (hour < 12) ? 'AM' : 'PM';
+    if(hour%12 !== 0) hour = hour%12; 
+    return hour + parity;
+}
+
+const daysOfWeek: Array<string> = ["Sunday, Monday, Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; 
+
+/**
+ * 
+ * @param day in string, like "Monday"
+ * @param lastDate in string, YYYY-MM-DD
+ * @returns string format of next date "2025-06-01"
+ */
+export function getNextDate(day: string, lastDate?: string): string{
+    const numDay = daysOfWeek.indexOf(day);
+    const d = lastDate? new Date(lastDate + "EDT") : new Date();
+    d.setDate(d.getDate() + (1 + 7 - d.getDay()) % 7);
+    return d.toISOString().split('T')[0];
 }

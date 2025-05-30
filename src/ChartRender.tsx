@@ -4,12 +4,10 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 import type { WeatherResponse } from "./utils/weather-types";
 import type { TimePeriod } from './utils/weather-types';
 import { allDay } from './utils/weather-types';
-import { filterTime, getNumHours, humanizeDay } from './utils/helper';
+import { filterTime, getNumHours, humanizeDay, humanizeTime } from './utils/helper';
 import './styles/Chart.css';
 
-Chart.register(CategoryScale);
-Chart.register(...registerables);
-Chart.register(annotationPlugin);
+Chart.register(CategoryScale, ...registerables, annotationPlugin);
 
 
 interface ChartProps {
@@ -60,7 +58,7 @@ const ChartRender: React.FC<ChartProps> = ({
                 data: temps,
                 yAxisID: 'y',
                 borderColor: 'blue',
-                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                backgroundColor: 'rgba(0, 123, 255, 0)',
                 fill: true,
                 tension: 0.3,
             },
@@ -72,7 +70,7 @@ const ChartRender: React.FC<ChartProps> = ({
                 data: humidity,
                 yAxisID: 'y2',
                 borderColor: 'green',
-                backgroundColor: 'rgba(0, 200, 83, 0.1)',
+                backgroundColor: 'rgba(0, 200, 83, 0)',
                 fill: false,
                 tension: 0.3,
             });
@@ -84,7 +82,7 @@ const ChartRender: React.FC<ChartProps> = ({
                 data: windspeed,
                 yAxisID: 'y3',
                 borderColor: 'orange',
-                backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                backgroundColor: 'rgba(255, 152, 0, 0)',
                 fill: false,
                 tension: 0.3,
             });
@@ -100,18 +98,17 @@ const ChartRender: React.FC<ChartProps> = ({
                 responsive: true,
                 scales: {
                     x: {
-                        title: { display: true, text: 'Hour of Day' },
                         ticks: {
                             callback: function(value, index, ticks) {
                                 const raw = this.getLabelForValue(value as number);
-                                return raw.split(":").slice(0, 2).join(":"); // Format as HH:MM
+                                return humanizeTime(raw);
                             }
                         }
                     },
                     y: {
                         title: { display: true, text: 'Temperature (°F)' },
                     },
-                    y2: hasPrecip ? {
+                    y2: hasPrecip ? {   
                         type: 'linear',
                         position: 'right',
                         title: { display: true, text: 'Humidity (%)' },
@@ -126,7 +123,7 @@ const ChartRender: React.FC<ChartProps> = ({
                 },
                 plugins: {
                     annotation: {
-                        annotations: {
+                        annotations: { //blocks off the out of range time period 
                             line1: {
                                 type: 'line',
                                 scaleID: 'x',
@@ -168,16 +165,16 @@ const ChartRender: React.FC<ChartProps> = ({
         };
     }, [weatherData]); 
     
-    return <>
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '-5%'}}>
+    return <span className='chart-container'>
+        <span style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '-5%'}}>
             <img className="chart-icon" 
                 src={window.location.origin + '/src/assets/icons/'+weatherData.days[0].icon+'.png'} 
             alt="Weather Icon" width="50"/>
             <h2 className="chart-title">{humanizeDay(weatherData.days[0].datetime)}</h2>
-        </div>
+        </span>
         <h3 className="chart-subtitle">{weatherData.days[0].conditions} | {weatherData.days[0].temp} °F</h3>
         <canvas ref={canvasRef} width={width} height={height} />
-    </>;
+    </span>;
 };
   
 export default ChartRender;

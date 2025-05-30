@@ -4,3 +4,18 @@
 .chart-subtitle{
     color: #90713c;;
 }
+.chart-nav-container {   
+    display: flex;
+    overflow: hidden;
+    background-color: bisque;
+    padding-left:4%;
+}
+.chart-container{
+    display: inline-block;
+    width: 100%;
+}
+.button-container{
+    align-items: right;
+    text-align: right;
+    margin-top: 2%;
+}
