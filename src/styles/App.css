@@ -44,3 +44,28 @@
 .Weather{
   padding: 0;
 }
+.input-container{
+  margin: 0 -10%;
+}
+input{
+  background-color: #ffffff;
+  color: #4a4a4a;
+  margin: -2% 0 2% 2%;
+  padding: 1%;
+  font-size: 20px;
+  border: 0;
+}
+select{
+  background-color: #ffffff;
+  color: #4a4a4a;
+  margin: 0 0 0 2%;
+  padding: 1%;
+  font-size: 20px;
+  border: 0;
+}
+
+label{
+  font-size: 20px;
+  margin-left: 3%;
+  color: #4a4a4a;
+}

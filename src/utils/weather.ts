@@ -5,6 +5,7 @@ import { weatherData2 } from "./example2";
 import { getNextDate } from "./helper";
 
 export async function firstTwoWeathers(location: string, day: string): Promise<WeatherResponse[]>{
+    console.log(location, day);
     const date = getNextDate(day);
     return [weatherData, weatherData2];
 }

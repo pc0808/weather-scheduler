@@ -61,7 +61,7 @@ export function humanizeTime(datetime: string): string {
     return hour + parity;
 }
 
-const daysOfWeek: Array<string> = ["Sunday, Monday, Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; 
+export const daysOfWeek: Array<string> = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; 
 
 /**
  * 
