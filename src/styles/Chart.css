@@ -7,7 +7,6 @@
 .chart-nav-container {   
     display: flex;
     overflow: hidden;
-    background-color: bisque;
     padding-left:4%;
 }
 .chart-container{

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type SetStateAction } from "react";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import { allDay, type WeatherResponse } from "./utils/weather-types";
 import { getNextWeather } from "./utils/weather";
@@ -11,12 +11,14 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 interface ChartNavigationProps {
   weatherDatas: Array<WeatherResponse>,
+  setWeatherDatas: React.Dispatch<SetStateAction<WeatherResponse[]>>,
   time?: TimePeriod,
   day: string,
 }
 
 const ChartNavigation: React.FC<ChartNavigationProps> = ({
     weatherDatas,
+    setWeatherDatas,
     time = allDay,
     day
   }) => {
@@ -42,13 +44,7 @@ const ChartNavigation: React.FC<ChartNavigationProps> = ({
         }, speed);
     };
 
-    async function addNext() {
-        const last = weatherDatas[weatherDatas.length-1];
-        setIsLoading(true); 
-        const next = await getNextWeather(last.resolvedAddress, day, last.days[0].datetime); 
-        weatherDatas.push(next); 
-        setIsLoading(false); 
-    }
+    
 
     return (
         <>
@@ -57,9 +53,6 @@ const ChartNavigation: React.FC<ChartNavigationProps> = ({
                 {weatherDatas.map((weather, index) => (
                     <ChartRender weatherData={weather} time={time}/>    
                 ))}
-                <div className="chart-container" style={{ width: 600, padding: "15% 15% 0",}}>
-                    <button disabled={isLoading} onClick={async () => await addNext()}>LOADING</button>
-                </div>
             </div>
         </span>
         <div className="button-container">

@@ -13,10 +13,16 @@ function getHourLabels(data: WeatherResponse){
  * @param time The specified time period to filter the data by
  */
 export function filterTime(data: WeatherResponse, time: TimePeriod): void{
-    const hours = data.days[0].hours.filter(hour => {
-        const hourNum = parseInt(hour.datetime.split(":")[0]); // Assuming datetime is in "HH:MM:SS" format'
-        return hourNum >= (time.start - time.threshold) && hourNum <= (time.end + time.threshold); 
-    });
+    let hours = []; 
+    try{
+        hours = data.days[0].hours.filter(hour => {
+            const hourNum = parseInt(hour.datetime.split(":")[0]); // Assuming datetime is in "HH:MM:SS" format'
+            return hourNum >= (time.start - time.threshold) && hourNum <= (time.end + time.threshold); 
+        });
+    }catch(e){
+        
+    }
+    
     data.days[0].hours = hours;
 }
 

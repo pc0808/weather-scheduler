@@ -128,7 +128,7 @@ const ChartRender: React.FC<ChartProps> = ({
                                 type: 'line',
                                 scaleID: 'x',
                                 borderDash: [6, 6],
-                                value: time.start + ':00:00',
+                                value: (time.start < 10 ? "0"+time.start : time.start) + ':00:00',
                                 borderColor: (time === allDay) ?'rgba(255, 153, 0, 0)': 'black',
                                 borderWidth: 1,
                             },
@@ -143,15 +143,15 @@ const ChartRender: React.FC<ChartProps> = ({
                             box1: {
                                 type: 'box',
                                 xMin: labels[0],
-                                xMax: time.start + ':00:00',
-                                backgroundColor: (time === allDay) ?'rgba(255, 255, 255, 0)': 'rgba(241, 238, 227, 0.7)',
+                                xMax: (time.start < 10 ? "0"+time.start : time.start) + ':00:00',
+                                backgroundColor: (time === allDay) ?'rgba(255, 255, 255, 0)': 'rgba(240, 190, 51, 0.3)',
                                 borderWidth: 0,
                             },
                             box2: {
                                 type: 'box',
                                 xMax: labels[labels.length - 1],
                                 xMin: time.end + ':00:00',
-                                backgroundColor: (time === allDay) ?'rgba(255, 255, 255, 0)': 'rgba(241, 238, 227, 0.7)',
+                                backgroundColor: (time === allDay) ?'rgba(255, 255, 255, 0)': 'rgba(240, 190, 51, 0.3)',
                                 borderWidth: 0,
                             }
                         }

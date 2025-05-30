@@ -1,36 +1,42 @@
 
 /**
+ * @param {string} name - literal name 
  * @param {number} start - The start of the period in hours (0-23).
  * @param {number} end - The end of the period in hours (0-24).
  * @param {number} threshold - The threshold hour to include in chart anyways.
  */
 interface TimePeriod{
+    name: string;
     start: number;
     end: number;
     threshold: number;
 }
 
 const morning: TimePeriod = {
+    name: "Morning",
     start: 8,
     end: 12,
     threshold: 1
 };
 const afternoon: TimePeriod = {
+    name: "Afternoon",
     start: 12,
     end: 16,
     threshold: 1
 };
 const evening: TimePeriod = {
+    name: "Evening",
     start: 16,
     end: 20,
     threshold: 1
 };
 const allDay : TimePeriod = {
+    name: "All Day",
     start: 0,
     end: 24,
     threshold: 0
 };
-
+export const timePeriods = [allDay, morning, afternoon, evening]; 
 export {morning, afternoon, evening, allDay};
 export type {TimePeriod};
 

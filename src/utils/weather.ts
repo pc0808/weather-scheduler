@@ -26,3 +26,10 @@ export async function getNextWeather(location:string, day: string, lastDate: str
     const url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"+location+"/"+date+"?key=CZZMY9ZZUTFKF8EZ69CZJF9WQ&include=hours"
     return await sendRequest(url); 
 }
+
+export async function updateWithNext(weathers: WeatherResponse[], day:string): Promise<WeatherResponse[]>{
+    const last = weathers[weathers.length-1];
+    const next = await getNextWeather(last.resolvedAddress, day, last.days[0].datetime); 
+    console.log("2", [...weathers, next]);
+    return [...weathers, next]; 
+}
