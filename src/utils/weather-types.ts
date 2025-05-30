@@ -4,33 +4,35 @@
  * @param {number} end - The end of the period in hours (0-24).
  * @param {number} threshold - The threshold hour to include in chart anyways.
  */
-interface period{
+interface TimePeriod{
     start: number;
     end: number;
     threshold: number;
 }
 
-const morning: period = {
+const morning: TimePeriod = {
     start: 8,
     end: 12,
     threshold: 1
 };
-const afternoon: period = {
+const afternoon: TimePeriod = {
     start: 12,
     end: 16,
     threshold: 1
 };
-const evening: period = {
+const evening: TimePeriod = {
     start: 16,
     end: 20,
     threshold: 1
 };
-
-const TimeFrame = {
-    morning,
-    afternoon,
-    evening
+const allDay : TimePeriod = {
+    start: 0,
+    end: 24,
+    threshold: 0
 };
+
+export {morning, afternoon, evening, allDay};
+export type {TimePeriod};
 
 export interface WeatherHour {
     datetime: string;

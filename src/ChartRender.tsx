@@ -1,23 +1,28 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart, CategoryScale, registerables } from "chart.js";
+import annotationPlugin from 'chartjs-plugin-annotation';
 import type { WeatherResponse } from "./utils/weather-types";
+import type { TimePeriod } from './utils/weather-types';
+import { allDay } from './utils/weather-types';
+import { filterTime, getNumHours, humanizeDay } from './utils/helper';
 import './styles/Chart.css';
 
 Chart.register(CategoryScale);
 Chart.register(...registerables);
+Chart.register(annotationPlugin);
 
 
 interface ChartProps {
     weatherData: WeatherResponse;
-    title: string;
+    time?: TimePeriod;
     width?: number;
     height?: number;
-  }
+}
 
 
 const ChartRender: React.FC<ChartProps> = ({
     weatherData,
-    title,
+    time = allDay,
     width = 600,
     height = 300,
   }) => {
@@ -35,51 +40,144 @@ const ChartRender: React.FC<ChartProps> = ({
             console.error("Canvas context not found");
             return;
         }
-  
+
+        filterTime(weatherData, time);
         const labels: Array<string> = weatherData.days[0].hours.map(hour => hour.datetime);
-        console.log("Hours :", weatherData.days[0].hours.map(hour => hour.datetime) );
-        console.log("Labels:", labels);
         const temps: Array<number> = weatherData.days[0].hours.map(hour => hour.temp);
-  
-        chartRef.current = new Chart(ctx, {
-            type: 'line',
-            data: {
-            labels,
-            datasets: [{
-                label: 'Temperature (°F)',
+        const humidity: Array<number> = weatherData.days[0].hours.map(hour => hour.humidity);
+        const windspeed: Array<number> = weatherData.days[0].hours.map(hour => hour.windspeed);
+
+        const hasPrecip = weatherData.days[0].humidity >= 25;
+        const windy = weatherData.days[0].hours.some(hour => hour.windgust > 20);
+
+        if (chartRef.current) {
+            chartRef.current.destroy();
+        }
+
+        const datasets = [
+            {
+                label: 'Temp (°F)',
                 data: temps,
+                yAxisID: 'y',
                 borderColor: 'blue',
                 backgroundColor: 'rgba(0, 123, 255, 0.1)',
                 fill: true,
                 tension: 0.3,
-            }],
+            },
+        ];
+
+        if (hasPrecip) {
+            datasets.push({
+                label: 'Humidity (%)',
+                data: humidity,
+                yAxisID: 'y2',
+                borderColor: 'green',
+                backgroundColor: 'rgba(0, 200, 83, 0.1)',
+                fill: false,
+                tension: 0.3,
+            });
+        }
+
+        if (windy) {
+            datasets.push({
+                label: 'Wind Speed (mph)',
+                data: windspeed,
+                yAxisID: 'y3',
+                borderColor: 'orange',
+                backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                fill: false,
+                tension: 0.3,
+            });
+        }
+
+        chartRef.current = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets
             },
             options: {
-            responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: title,
+                responsive: true,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Hour of Day' },
+                        ticks: {
+                            callback: function(value, index, ticks) {
+                                const raw = this.getLabelForValue(value as number);
+                                return raw.split(":").slice(0, 2).join(":"); // Format as HH:MM
+                            }
+                        }
+                    },
+                    y: {
+                        title: { display: true, text: 'Temperature (°F)' },
+                    },
+                    y2: hasPrecip ? {
+                        type: 'linear',
+                        position: 'right',
+                        title: { display: true, text: 'Humidity (%)' },
+                        grid: { drawOnChartArea: false,},
+                    }: undefined,
+                    y3: (windy && !hasPrecip) ? {
+                        type: 'linear',
+                        position: 'right',
+                        title: { display: true, text: 'Wind Speed (mph)' },
+                        grid: { drawOnChartArea: false,},
+                    } : undefined,
                 },
-            },
-            scales: {
-                x: {
-                    title: { display: true, text: 'Hour of Day' },
-                },
-                y: {
-                    title: { display: true, text: 'Temperature (°F)' },
-                },
-            },
+                plugins: {
+                    annotation: {
+                        annotations: {
+                            line1: {
+                                type: 'line',
+                                scaleID: 'x',
+                                borderDash: [6, 6],
+                                value: time.start + ':00:00',
+                                borderColor: (time === allDay) ?'rgba(255, 153, 0, 0)': 'black',
+                                borderWidth: 1,
+                            },
+                            line2: {
+                                type: 'line',
+                                scaleID: 'x',
+                                borderDash: [6, 6],
+                                value: time.end + ':00:00',
+                                borderColor: (time === allDay) ?'rgba(255, 153, 0, 0)': 'black',
+                                borderWidth: 1,
+                            },
+                            box1: {
+                                type: 'box',
+                                xMin: labels[0],
+                                xMax: time.start + ':00:00',
+                                backgroundColor: (time === allDay) ?'rgba(255, 255, 255, 0)': 'rgba(241, 238, 227, 0.7)',
+                                borderWidth: 0,
+                            },
+                            box2: {
+                                type: 'box',
+                                xMax: labels[labels.length - 1],
+                                xMin: time.end + ':00:00',
+                                backgroundColor: (time === allDay) ?'rgba(255, 255, 255, 0)': 'rgba(241, 238, 227, 0.7)',
+                                borderWidth: 0,
+                            }
+                        }
+                    }
+                  }
             },
         });
   
         return () => {
             chartRef.current?.destroy();
         };
-    }, [weatherData, title]);
+    }, [weatherData]); 
     
-    
-    return <canvas ref={canvasRef} width={width} height={height} />;
+    return <>
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '-5%'}}>
+            <img className="chart-icon" 
+                src={window.location.origin + '/src/assets/icons/'+weatherData.days[0].icon+'.png'} 
+            alt="Weather Icon" width="50"/>
+            <h2 className="chart-title">{humanizeDay(weatherData.days[0].datetime)}</h2>
+        </div>
+        <h3 className="chart-subtitle">{weatherData.days[0].conditions} | {weatherData.days[0].temp} °F</h3>
+        <canvas ref={canvasRef} width={width} height={height} />
+    </>;
 };
   
 export default ChartRender;
