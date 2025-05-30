@@ -3,11 +3,15 @@ import type { WeatherResponse } from "./weather-types";
 import {weatherData} from "./example";
 import { weatherData2 } from "./example2";
 import { getNextDate } from "./helper";
+import { fetchy, sendRequest } from "./fetchy";
 
 export async function firstTwoWeathers(location: string, day: string): Promise<WeatherResponse[]>{
     console.log(location, day);
     const date = getNextDate(day);
-    return [weatherData, weatherData2];
+    const url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"+location+"/"+date+"?key=CZZMY9ZZUTFKF8EZ69CZJF9WQ&include=hours"
+    const one = await sendRequest(url); 
+    const two = await getNextWeather(location, day, date); 
+    return [one, two];
 }
 
 /**
@@ -18,6 +22,7 @@ export async function firstTwoWeathers(location: string, day: string): Promise<W
  * @returns 
  */
 export async function getNextWeather(location:string, day: string, lastDate: string): Promise<WeatherResponse> {
-    const data = getNextDate(day, lastDate);
-    return weatherData; 
+    const date = getNextDate(day, lastDate);
+    const url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"+location+"/"+date+"?key=CZZMY9ZZUTFKF8EZ69CZJF9WQ&include=hours"
+    return await sendRequest(url); 
 }

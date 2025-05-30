@@ -11,14 +11,10 @@ export default function App() {
   const [count, setCount] = useState(2);
   const [loaded, setLoaded] = useState(true); 
   const [chosen, setChosen] = useState(false);
-  const [zipCode, setZipCode] = useState(10001); 
   const [day, setDay] = useState("Sunday");
   const [weathers, setWeathers] = useState<Array<WeatherResponse>>([weatherData, weatherData2, weatherData]);
 
-  // Event handlers to update state variables
-  const handleZipChange = (event: { target: { value: SetStateAction<number>; }; }) => {
-    setZipCode(event.target.value);
-};
+
 
   async function loadInitial(){
     const location = document.getElementById("zip").value.toString() ?? "10001"; 
@@ -40,7 +36,7 @@ export default function App() {
         <img src={window.location.origin + '/src/assets/usa.png'} alt="USA emote" width="50" style={{marginBottom: "-10px"}}/>
         <label>
           ZipCode: 
-          <input type="number" placeholder={zipCode.toString()} id="zip" />
+          <input type="number" placeholder="10001" id="zip" />
         </label>
         <label>
           Every: 

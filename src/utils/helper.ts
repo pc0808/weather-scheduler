@@ -69,9 +69,15 @@ export const daysOfWeek: Array<string> = ["Sunday", "Monday", "Tuesday", "Wednes
  * @param lastDate in string, YYYY-MM-DD
  * @returns string format of next date "2025-06-01"
  */
-export function getNextDate(day: string, lastDate?: string): string{
-    const numDay = daysOfWeek.indexOf(day);
+export function getNextDate(targetDay: string, lastDate?: string): string{
+    const numDay = daysOfWeek.indexOf(targetDay);
+    
     const d = lastDate? new Date(lastDate + "EDT") : new Date();
-    d.setDate(d.getDate() + (1 + 7 - d.getDay()) % 7);
+    const currentDay = d.getDay(); 
+
+    // Calculate the number of days until the target day
+    const daysUntilTarget = (numDay - currentDay + 7) % 7 || 7;
+
+    d.setDate(d.getDate() + daysUntilTarget);
     return d.toISOString().split('T')[0];
 }
